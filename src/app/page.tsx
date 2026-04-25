@@ -8,8 +8,9 @@ import prisma from '@/lib/prisma';
 
 export default async function Home() {
   const projects = await prisma.project.findMany({
-    orderBy: { orderIndex: 'asc' },
+    orderBy: { createdAt: 'desc' },
   });
+
 
   const reviews = await prisma.review.findMany({
     orderBy: { createdAt: 'desc' },

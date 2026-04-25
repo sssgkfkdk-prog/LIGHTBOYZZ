@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 
 export async function DELETE(
@@ -11,8 +12,11 @@ export async function DELETE(
     await prisma.review.delete({
       where: { id },
     });
+
+    revalidatePath('/');
     return NextResponse.json({ message: 'Review deleted' });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 });
   }
 }
+

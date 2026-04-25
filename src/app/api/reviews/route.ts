@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
+
 
 export async function GET() {
   try {
@@ -26,8 +30,11 @@ export async function POST(request: Request) {
         rating: Number(rating) || 5,
       },
     });
+
+    revalidatePath('/');
     return NextResponse.json(review);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create review' }, { status: 500 });
   }
 }
+
