@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, LogOut, Check, X, Star, Users, Briefcase } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Check, X, Star, Users, Briefcase, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
 
 type Project = {
@@ -43,6 +43,51 @@ export default function AdminDashboard() {
   const [rRating, setRRating] = useState(5);
 
   const [loading, setLoading] = useState(false);
+
+  const handleImageUpload = (file: File) => {
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setPImageUrl(dataUrl);
+        };
+        img.src = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     if (localStorage.getItem('admin_auth') === 'true') {
@@ -211,7 +256,43 @@ export default function AdminDashboard() {
               {activeTab === 'projects' ? (
                 <form onSubmit={handlePSubmit} className="flex flex-col gap-4">
                   <input required placeholder="Title" value={pTitle} onChange={e => setPTitle(e.target.value)} className="w-full bg-[#1c110a] border border-[#4a2e1b] rounded-xl px-4 py-3 outline-none focus:border-[#e76f51]" />
-                  <input required placeholder="Image URL" type="url" value={pImageUrl} onChange={e => setPImageUrl(e.target.value)} className="w-full bg-[#1c110a] border border-[#4a2e1b] rounded-xl px-4 py-3 outline-none focus:border-[#e76f51]" />
+                  <div 
+                    className={`w-full border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors ${pImageUrl ? 'border-[#e76f51] bg-[#1c110a]' : 'border-[#4a2e1b] hover:border-[#f4a261] bg-[#1c110a]'}`}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        handleImageUpload(e.dataTransfer.files[0]);
+                      }
+                    }}
+                    onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                  >
+                    <input 
+                      type="file" 
+                      id="thumbnail-upload" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleImageUpload(e.target.files[0]);
+                        }
+                      }} 
+                    />
+                    {pImageUrl ? (
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                        <img src={pImageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <p className="text-white font-bold flex items-center gap-2"><UploadCloud size={18} /> Change Image</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud size={32} className="text-[#f4a261]" />
+                        <p className="text-[#fcf6f0] font-bold">Drag & Drop Thumbnail</p>
+                        <p className="text-sm text-[#f4a261]/70">or click to browse</p>
+                      </>
+                    )}
+                  </div>
                   <textarea placeholder="Description" value={pDescription} onChange={e => setPDescription(e.target.value)} className="w-full bg-[#1c110a] border border-[#4a2e1b] rounded-xl px-4 py-3 outline-none focus:border-[#e76f51] h-32 resize-none" />
                   <button type="submit" className="w-full bg-[#e76f51] text-white font-bold py-3 rounded-xl hover:bg-[#d65a3d] transition-all">SAVE PROJECT</button>
                   {editingProject && <button type="button" onClick={resetPForm} className="text-[#f4a261] text-sm">Cancel Edit</button>}
