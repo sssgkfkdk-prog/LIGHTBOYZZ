@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-heading: var(--font-outfit), sans-serif;
+}
+
+:root {
+  --background: #1c110a; /* Dark warm brown */
+  --foreground: #fcf6f0; /* Off-white / warm beige */
+  --accent-orange: #e76f51;
+  --accent-gold: #f4a261;
+  --accent-yellow: #e9c46a;
+}
+
+body {
+  color: var(--foreground);
+  background: radial-gradient(circle at top right, rgba(231, 111, 81, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at bottom left, rgba(244, 162, 97, 0.1) 0%, transparent 40%),
+              #1c110a; /* Base dark brown */
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+}
+
+.gradient-text {
+  background: linear-gradient(to right, var(--accent-orange), var(--accent-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-pill {
+  @apply px-6 py-2 rounded-full font-medium transition-all duration-300;
+}
+
+.btn-pill-dark {
+  @apply bg-[#2d1b11] text-[#fcf6f0] hover:bg-[#3d2517] border border-[#3d2517];
+}
+
+.btn-pill-orange {
+  @apply bg-[#e76f51] text-white hover:bg-[#d65a3d] shadow-[0_0_15px_rgba(231,111,81,0.4)];
+}
+
+.card {
+  @apply bg-[#2d1b11]/80 backdrop-blur-md border border-[#4a2e1b] rounded-xl overflow-hidden transition-all duration-300;
+}
+
+.card:hover {
+  @apply border-[#e76f51] shadow-[0_0_20px_rgba(231,111,81,0.2)] transform -translate-y-1;
+}
+
+/* Subtle animated background particles/glow */
+.bg-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+  background-image: radial-gradient(circle at 50% 50%, rgba(244, 162, 97, 0.05) 0%, transparent 60%);
+  animation: pulseGlow 8s infinite alternate ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: fit-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1c110a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-orange);
+  border-radius: 10px;
+  border: 2px solid #1c110a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
+
+/* Text Selection */
+::selection {
+  background-color: var(--accent-orange);
+  color: white;
+}
